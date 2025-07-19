@@ -1,8 +1,8 @@
 ---
 title: Cài đặt Extension Swoole cho Herd trên macOS
 date: 2025-07-19
-categories: [PHP]
-tags: [php]  
+categories: [PHP, Laravel, MacOS]
+tags: [php, swoole, herd, extension, install, mac]
 author: 
   name: jhin1m
   link: https://github.com/jhin1m
