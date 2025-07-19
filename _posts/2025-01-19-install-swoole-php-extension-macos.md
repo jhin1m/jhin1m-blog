@@ -1,6 +1,6 @@
 ---
 title: Cài đặt Extension Swoole cho Herd trên macOS
-date: {{ date }}
+date: 2025-07-19
 categories: [PHP]
 tags: [php]  
 author: 
