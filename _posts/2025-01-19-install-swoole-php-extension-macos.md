@@ -3,132 +3,130 @@ title: Cài đặt Extension Swoole cho Herd trên macOS
 date: 2025-07-19
 categories: [PHP, Laravel, MacOS]
 tags: [php, swoole, herd, extension, install, mac]
-author: 
-  name: jhin1m
-  link: https://github.com/jhin1m
 ---
 
-Dưới đây là hướng dẫn **đầy đủ và chuẩn xác** để **cài đặt extension Swoole cho PHP của Herd trên macOS**, áp dụng cho máy dùng chip Intel **hoặc Apple Silicon (M1/M2)**.
+Tình trạng là tôi đang dùng **Herd trên macOS** và muốn cài **Swoole** để tăng tốc cho Laravel Octane, nhưng đọc tài liệu trên Herd thì báo không support thư viện này, sau 1 hồi vật lộn và research bằng mấy con AI thì cuối cùng cũng xong.
 
-----------
+ Bài viết này sẽ giúp bạn thiết lập mọi thứ một cách chuẩn chỉnh — áp dụng cho cả máy **Intel** lẫn **Apple Silicon (M1/M2)**.
 
-# 🧠 Hướng dẫn cài đặt **Swoole cho Herd** trên macOS (ví dụ PHP 8.3)
+---
 
-----------
+## 1. Cài PHP từ Homebrew (để dùng `pecl`)
 
-## ✅ 1. Cài PHP  từ Homebrew (bắt buộc để dùng `pecl`)
+Herd không tích hợp sẵn `pecl`, vì vậy bạn cần cài PHP thông qua Homebrew để sử dụng lệnh này.
 
-Herd không đi kèm `pecl`, nên bạn cần PHP Homebrew để sử dụng:
-
-Tôi sử dụng PHP 8.3 nên cài phiên bản php 8.3 tương ứng với homebrew, mục đích để cài extension khớp với php của Herd
+Ví dụ: mình đang dùng PHP 8.3, nên sẽ chạy:
 
 ```bash
 brew install php@8.3
 ```
 
-Sau khi cài xong, bạn sẽ có `pecl` tại:
+Sau khi cài xong, bạn sẽ có thể chạy `pecl` tại:
 
-```bash
-/opt/homebrew/opt/php@8.3/bin/pecl  # (Apple Silicon)
-# hoặc
-/usr/local/opt/php@8.3/bin/pecl     # (Intel)
+* Apple Silicon:
+  `/opt/homebrew/opt/php@8.3/bin/pecl`
 
-```
+* Intel:
+  `/usr/local/opt/php@8.3/bin/pecl`
 
-----------
+---
 
-## ✅ 2. Cài `pcre2` – thư viện bắt buộc để build Swoole
+## 2. Cài thêm thư viện `pcre2`
+
+Đây là thư viện cần thiết để biên dịch Swoole:
 
 ```bash
 brew install pcre2
 ```
 
-----------
+---
 
-## ✅ 3. Xuất biến môi trường để tránh lỗi build
+## 3. Xuất biến môi trường (để tránh lỗi build)
 
-Vì lỗi linh tinh khi cài swoole, sau 1 hồi google thì tìm được cách này
+Một số lỗi khi cài Swoole sẽ biến mất nếu bạn thêm các biến môi trường sau:
+
+Cái này mình hỏi ChatGPT.
 
 ```bash
 export CPPFLAGS="-I/opt/homebrew/include"
 export LDFLAGS="-L/opt/homebrew/lib"
-
 ```
 
-> Bạn có thể thêm 2 dòng này vào `~/.zshrc` để dùng mãi mãi.
+Nếu muốn dùng luôn về sau, bạn có thể thêm vào `~/.zshrc` hoặc `~/.bash_profile`.
 
-----------
+---
 
-## ✅ 4. Cài đặt Swoole bằng `pecl`
+## 4. Cài đặt Swoole bằng `pecl`
+
+Chạy lệnh cài:
 
 ```bash
 /opt/homebrew/opt/php@8.3/bin/pecl install swoole
 ```
 
-> Nếu đang dùng Intel Mac, thay đường dẫn bằng `/usr/local/opt/php@8.3/bin/pecl`
+Cái này dùng PHP của homebrew để cài nhé.
 
-----------
+> Nếu bạn dùng Intel Mac, thay đường dẫn thành `/usr/local/opt/php@8.3/bin/pecl`
 
-## ✅ 5. Xác định đường dẫn `.so` sau khi cài
+---
 
-Chạy lệnh này để tìm đường dẫn swoole
+## 5. Tìm đường dẫn extension `.so` của Swoole sau khi cài
 
- `find /opt/homebrew/lib/php -name swoole.so`
+Sau khi cài xong, chạy lệnh sau để tìm file extension `.so`:
 
-Sẽ có kết quả sau
+```bash
+find /opt/homebrew/lib/php -name swoole.so
+```
 
-`/opt/homebrew/lib/php/pecl/20230831/swoole.so` 
+Ví dụ kết quả:
 
-### 📍 Ghi chú:
+```
+/opt/homebrew/lib/php/pecl/20230831/swoole.so
+```
 
-Kiến trúc máy
+### Ghi chú nhanh:
 
-Đường dẫn `.so`
+| Kiến trúc     | Đường dẫn extension `.so`                  |
+| ------------- | ------------------------------------------ |
+| Apple Silicon | `/opt/homebrew/lib/php/pecl/.../swoole.so` |
+| Intel         | `/usr/local/lib/php/pecl/.../swoole.so`    |
 
-Apple Silicon (M1/M2)
+---
 
-`/opt/homebrew/lib/php/pecl/.../swoole.so`
+## 6. Thêm Swoole vào `php.ini` của Herd
 
-Intel Mac
-
-`/usr/local/lib/php/pecl/.../swoole.so`
-
-----------
-
-## ✅ 6. Kích hoạt Swoole trong PHP của Herd
-
-Herd sử dụng file `php.ini` riêng, không dùng chung với Homebrew.
-
-### 📄 File `php.ini` của Herd nằm ở:
-
-Với PHP 8.3 của Herd tôi đang sử dụng
+Herd sử dụng `php.ini` riêng, không dùng chung với PHP Homebrew. Với PHP 8.3, đường dẫn file là:
 
 ```
 ~/Library/Application Support/Herd/config/php/8.3/php.ini
-
 ```
 
-### ➕ Mở và thêm dòng sau:
+Mở file này và thêm dòng:
 
 ```ini
-extension=/opt/homebrew/lib/php/pecl/XXXXXX/swoole.so
+extension=/opt/homebrew/lib/php/pecl/XXXXXXXX/swoole.so
 ```
 
-> Điều chỉnh `XXXXXXXX` theo đúng thư mục version của Swoole được tạo trên máy bạn.
+> Hãy thay `XXXXXXXX` bằng đúng thư mục mà bạn tìm được ở bước 5.
 
-----------
+---
 
-## ✅ 7. Kiểm tra hoạt động
+## 7. Kiểm tra Swoole đã hoạt động chưa
+
+Bạn có thể kiểm tra bằng lệnh sau:
 
 ```bash
 php -m | grep swoole
 php -r "echo swoole_version();"
 ```
 
-Kết quả ví dụ:
+Kết quả mong đợi:
 
 ```
 swoole
 6.0.2
 ```
-----------
+
+---
+
+Vậy là xong! Giờ bạn đã có Swoole hoạt động ngon lành cùng Herd trên macOS.
