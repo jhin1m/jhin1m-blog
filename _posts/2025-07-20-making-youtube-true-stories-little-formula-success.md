@@ -7,7 +7,7 @@ tags: [youtube, content-creator, strategy, growth, video, tips]
 
 Bài viết này tôi tóm tắt từ 1 Youtuber **Bog**
 
-Bạn có thể xem toàn bộ video ở đây => **[link](https://www.youtube.com/watch?v=nISkrDCpHxw)**
+Bạn có thể xem toàn bộ video ở đây: **[link](https://www.youtube.com/watch?v=nISkrDCpHxw)**
 
 # Làm YouTube: Câu Chuyện Thật Và Một Chút "Công Thức Thành Công"
 
